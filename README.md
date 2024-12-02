@@ -25,11 +25,11 @@ table. ✨
 ## Technologies Used
 
 * **Python:** Backend logic and API creation. 🐍
-* **Flask:** Web framework for Python. frasco
+* **Flask:** Web framework for Python. 🌶️ 
 * **Pandas:** Data manipulation and analysis library for Python. 🐼
 * **HTML, CSS, JavaScript:** Frontend development. 🌐
 * **Bootstrap:** CSS framework for responsive design. Bootstrap
-* **NProgress:** JavaScript library for displaying progress bars. 进度条
+* **NProgress:** JavaScript library for displaying progress bars. NProgress 📊
 
 ![Screenshot](static/ss.png)
 
