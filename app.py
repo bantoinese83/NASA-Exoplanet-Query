@@ -4,8 +4,8 @@ import logging
 
 app = Flask(__name__)
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
+
 
 def load_exoplanet_data(file_path):
     try:
@@ -30,7 +30,9 @@ def load_exoplanet_data(file_path):
         logging.error(f"An error occurred while loading the CSV: {e}")
         return pd.DataFrame()
 
+
 exoplanet_data = load_exoplanet_data("static/exoplanets.csv")
+
 
 def search_exoplanets(query_params, data):
     df = data.copy()
@@ -39,38 +41,54 @@ def search_exoplanets(query_params, data):
             df = df[df[key] == value]
     return df
 
+
 def create_table_data(df):
     columns = ['DATE', 'PLANETDISCMETH', 'NAME', 'STAR']
     return df[columns].to_dict('records')
+
 
 def get_query_params():
     return {
         'DATE': request.form.get('discovery_year'),
         'PLANETDISCMETH': request.form.get('discovery_method'),
         'NAME': request.form.get('host_name'),
-        'STAR': request.form.get('discovery_facility'),
+        'STAR': request.form.get('discovery_facility')
     }
+
+
+def get_sort_params():
+    return {
+        'sort': request.form.get('sort'),
+        'order': request.form.get('order', 'asc')
+    }
+
 
 def get_filter_options(data):
     return {
         'discovery_years': sorted(data['DATE'].unique()) if 'DATE' in data.columns else [],
-        'discovery_methods': sorted(data['PLANETDISCMETH'].dropna().unique()) if 'PLANETDISCMETH' in data.columns else [],
+        'discovery_methods': sorted(
+            data['PLANETDISCMETH'].dropna().unique()) if 'PLANETDISCMETH' in data.columns else [],
         'host_names': sorted(data['NAME'].dropna().unique()) if 'NAME' in data.columns else [],
         'discovery_facilities': sorted(data['STAR'].dropna().unique()) if 'STAR' in data.columns else []
     }
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     query_params = get_query_params()
+    sort_params = get_sort_params()
     valid_params = {k: v for k, v in query_params.items() if v}
 
-    sort_column = request.args.get('sort')
-    sort_order = request.args.get('order', 'asc')
+    sort_column = sort_params.get('sort')
+    sort_order = sort_params.get('order', 'asc')
 
-    if request.method == 'POST' and valid_params:
+    if request.method == 'POST' and any(valid_params.values()):
         results = search_exoplanets(valid_params, exoplanet_data)
         if sort_column:
-            results = results.sort_values(by=sort_column, ascending=(sort_order == 'asc'))
+            try:
+                results = results.sort_values(by=sort_column, ascending=(sort_order == 'asc'))
+            except KeyError:
+                logging.warning(f"Invalid sort column: {sort_column}")
         table_data = create_table_data(results)
         has_results = True
     else:
@@ -78,15 +96,9 @@ def index():
         has_results = False
 
     filter_options = get_filter_options(exoplanet_data)
+    return render_template('index.html', **filter_options, table_data=table_data, has_results=has_results,
+                           query_params=query_params, sort_params=sort_params)
 
-    return render_template('index.html',
-                           discovery_years=filter_options['discovery_years'],
-                           discovery_methods=filter_options['discovery_methods'],
-                           host_names=filter_options['host_names'],
-                           discovery_facilities=filter_options['discovery_facilities'],
-                           table_data=table_data,
-                           has_results=has_results,
-                           query_params=query_params)
 
 if __name__ == '__main__':
     app.run(debug=True)
