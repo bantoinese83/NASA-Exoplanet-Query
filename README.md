@@ -25,7 +25,7 @@ table. ✨
 ## Technologies Used
 
 * **Python:** Backend logic and API creation. 🐍
-* **Flask:** Web framework for Python. 🌶️ 
+* **Flask:** Web framework for Python. 🌶️
 * **Pandas:** Data manipulation and analysis library for Python. 🐼
 * **HTML, CSS, JavaScript:** Frontend development. 🌐
 * **Bootstrap:** CSS framework for responsive design. Bootstrap
@@ -34,12 +34,12 @@ table. ✨
 ![Screenshot](static/ss.png)
 
 <h2 align="center">📈 GitHub Stats 📈</h2>
-  <div align="center">
-      <img width="50%" src="https://github-readme-stats.vercel.app/api?username=bantoinese83&show_icons=true&theme=radical&count_private=true" alt="GitHub Stats" />
-      <img width="50%" src="https://github-readme-stats.vercel.app/api/top-langs/?username=bantoinese83&layout=compact&theme=radical&langs_count=8" alt="Top Languages" />
-    <br/>
-    <img width="50%" src="https://github-readme-streak-stats.herokuapp.com/?user=bantoinese83&theme=radical" alt="GitHub Streak" />
-    <img width="50%" src="https://github-profile-trophy.vercel.app/?username=bantoinese83&theme=radical&no-frame=true&row=1" alt="Trophies"/>
+<div align="center">
+<img width="50%" src="https://github-readme-stats.vercel.app/api?username=bantoinese83&show_icons=true&theme=radical&count_private=true" alt="GitHub Stats" />
+<img width="50%" src="https://github-readme-stats.vercel.app/api/top-langs/?username=bantoinese83&layout=compact&theme=radical&langs_count=8" alt="Top Languages" />
+<br/>
+<img width="50%" src="https://github-readme-streak-stats.herokuapp.com/?user=bantoinese83&theme=radical" alt="GitHub Streak" />
+<img width="50%" src="https://github-profile-trophy.vercel.app/?username=bantoinese83&theme=radical&no-frame=true&row=1" alt="Trophies"/>
 
 ## Support
 
@@ -47,8 +47,8 @@ If you like this project, consider buying me a coffee:
 
 [![Buy Me a Coffee](https://img.shields.io/badge/-Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/base83)
 
-  </div>
-
+</div>
+## License
 
 
 
