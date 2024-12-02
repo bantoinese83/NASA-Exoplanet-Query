@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NASA Exoplanet Query">
+    <meta name="description" content="Query the NASA Exoplanet Archive to find information about exoplanets discovered by various methods and facilities.">
+    <meta name="keywords" content="NASA, exoplanet, query, discovery, space, astronomy">
+    <meta name="author" content="Bryan Antoine">
+    <meta property="og:title" content="NASA Exoplanet Query">
+    <meta property="og:description" content="Query the NASA Exoplanet Archive to find information about exoplanets discovered by various methods and facilities.">
+    <meta property="og:image" content="static/og-image.jpg">
+    <meta property="og:image:alt" content="A beautiful image of an exoplanet discovered by NASA.">
+    <meta property="og:url" content="https://github.com/bantoinese83">
     <title>NASA Exoplanet Query</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -93,96 +100,100 @@
 </head>
 <body>
 <div class="container glass">
-    <h1>NASA Exoplanet Query</h1>
-    <form method="POST" onsubmit="return validateForm()">
-        <div class="form-group">
-            <label for="discovery_year">Discovery Year:</label>
-            <select id="discovery_year" name="discovery_year" class="form-control">
-                <option value="">All</option>
-                {% for year in discovery_years %}
-                    <option value="{{ year }}"
-                            {% if query_params.DATE == year %}selected{% endif %}>{{ year }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    <header>
+        <h1>NASA Exoplanet Query</h1>
+    </header>
+    <main>
+        <form method="POST" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="discovery_year">Discovery Year:</label>
+                <select id="discovery_year" name="discovery_year" class="form-control">
+                    <option value="">All</option>
+                    {% for year in discovery_years %}
+                        <option value="{{ year }}"
+                                {% if query_params.DATE == year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="discovery_method">Discovery Method:</label>
-            <select id="discovery_method" name="discovery_method" class="form-control">
-                <option value="">All</option>
-                {% for method in discovery_methods %}
-                    <option value="{{ method }}"
-                            {% if query_params.PLANETDISCMETH == method %}selected{% endif %}>{{ method }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="discovery_method">Discovery Method:</label>
+                <select id="discovery_method" name="discovery_method" class="form-control">
+                    <option value="">All</option>
+                    {% for method in discovery_methods %}
+                        <option value="{{ method }}"
+                                {% if query_params.PLANETDISCMETH == method %}selected{% endif %}>{{ method }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="host_name">Host Name:</label>
-            <select id="host_name" name="host_name" class="form-control">
-                <option value="">All</option>
-                {% for name in host_names %}
-                    <option value="{{ name }}"
-                            {% if query_params.NAME == name %}selected{% endif %}>{{ name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="host_name">Host Name:</label>
+                <select id="host_name" name="host_name" class="form-control">
+                    <option value="">All</option>
+                    {% for name in host_names %}
+                        <option value="{{ name }}"
+                                {% if query_params.NAME == name %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="discovery_facility">Discovery Facility:</label>
-            <select id="discovery_facility" name="discovery_facility" class="form-control">
-                <option value="">All</option>
-                {% for facility in discovery_facilities %}
-                    <option value="{{ facility }}"
-                            {% if query_params.STAR == facility %}selected{% endif %}>{{ facility }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="discovery_facility">Discovery Facility:</label>
+                <select id="discovery_facility" name="discovery_facility" class="form-control">
+                    <option value="">All</option>
+                    {% for facility in discovery_facilities %}
+                        <option value="{{ facility }}"
+                                {% if query_params.STAR == facility %}selected{% endif %}>{{ facility }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="form-group">
-            <input type="hidden" id="sort" name="sort" value="{{ sort_params.sort or '' }}">
-            <input type="hidden" id="order" name="order" value="{{ sort_params.order or 'asc' }}">
-            <button type="submit" class="btn btn-primary" onclick="startProgress()">Search</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Clear</button>
-        </div>
+            <div class="form-group">
+                <input type="hidden" id="sort" name="sort" value="{{ sort_params.sort or '' }}">
+                <input type="hidden" id="order" name="order" value="{{ sort_params.order or 'asc' }}">
+                <button type="submit" class="btn btn-primary" onclick="startProgress()">Search</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Clear</button>
+            </div>
 
-        {% if not has_results and request.method == 'POST' %}
-            <p class="error-message">Please select at least one search criteria.</p>
-        {% endif %}
-    </form>
+            {% if not has_results and request.method == 'POST' %}
+                <p class="error-message">Please select at least one search criteria.</p>
+            {% endif %}
+        </form>
 
-    {% if has_results %}
-        <table class="table table-dark table-striped">
-            <thead>
-            <tr>
-                <th>Discovery Year <a href="#" onclick="sortTable('DATE', 'asc')">&#9650;</a> <a href="#"
-                                                                                                 onclick="sortTable('DATE', 'desc')">&#9660;</a>
-                </th>
-                <th>Discovery Method <a href="#" onclick="sortTable('PLANETDISCMETH', 'asc')">&#9650;</a> <a href="#"
-                                                                                                             onclick="sortTable('PLANETDISCMETH', 'desc')">&#9660;</a>
-                </th>
-                <th>Host Name <a href="#" onclick="sortTable('NAME', 'asc')">&#9650;</a> <a href="#"
-                                                                                            onclick="sortTable('NAME', 'desc')">&#9660;</a>
-                </th>
-                <th>Discovery Facility <a href="#" onclick="sortTable('STAR', 'asc')">&#9650;</a> <a href="#"
-                                                                                                     onclick="sortTable('STAR', 'desc')">&#9660;</a>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for row in table_data %}
+        {% if has_results %}
+            <table class="table table-dark table-striped">
+                <thead>
                 <tr>
-                    <td>{{ row.DATE }}</td>
-                    <td>{{ row.PLANETDISCMETH }}</td>
-                    <td>
-                        <a href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname={{ row.NAME }}"
-                           target="_blank">{{ row.NAME }}</a></td>
-                    <td>{{ row.STAR }}</td>
+                    <th>Discovery Year <a href="#" onclick="sortTable('DATE', 'asc')">&#9650;</a> <a href="#"
+                                                                                                     onclick="sortTable('DATE', 'desc')">&#9660;</a>
+                    </th>
+                    <th>Discovery Method <a href="#" onclick="sortTable('PLANETDISCMETH', 'asc')">&#9650;</a> <a href="#"
+                                                                                                                 onclick="sortTable('PLANETDISCMETH', 'desc')">&#9660;</a>
+                    </th>
+                    <th>Host Name <a href="#" onclick="sortTable('NAME', 'asc')">&#9650;</a> <a href="#"
+                                                                                                onclick="sortTable('NAME', 'desc')">&#9660;</a>
+                    </th>
+                    <th>Discovery Facility <a href="#" onclick="sortTable('STAR', 'asc')">&#9650;</a> <a href="#"
+                                                                                                         onclick="sortTable('STAR', 'desc')">&#9660;</a>
+                    </th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+                </thead>
+                <tbody>
+                {% for row in table_data %}
+                    <tr>
+                        <td>{{ row.DATE }}</td>
+                        <td>{{ row.PLANETDISCMETH }}</td>
+                        <td>
+                            <a href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname={{ row.NAME }}"
+                               target="_blank">{{ row.NAME }}</a></td>
+                        <td>{{ row.STAR }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </main>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
