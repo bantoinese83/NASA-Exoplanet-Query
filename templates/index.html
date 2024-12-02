@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NASA Exoplanet Query">
+    <title>NASA Exoplanet Query</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-image: url('static/bg-image.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #FF5733;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #FF5733;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #FF5733;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #FF5733;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            color: #FF5733;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group select, .form-group button {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #FF5733;
+            border: 1px solid #FF5733;
+        }
+
+        .form-group button {
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="container glass">
+    <h1>NASA Exoplanet Query</h1>
+    <form method="POST" onsubmit="return validateForm()">
+        <div class="form-group">
+            <label for="discovery_year">Discovery Year:</label>
+            <select id="discovery_year" name="discovery_year" class="form-control">
+                <option value="">All</option>
+                {% for year in discovery_years %}
+                    <option value="{{ year }}"
+                            {% if query_params.DATE == year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="discovery_method">Discovery Method:</label>
+            <select id="discovery_method" name="discovery_method" class="form-control">
+                <option value="">All</option>
+                {% for method in discovery_methods %}
+                    <option value="{{ method }}"
+                            {% if query_params.PLANETDISCMETH == method %}selected{% endif %}>{{ method }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="host_name">Host Name:</label>
+            <select id="host_name" name="host_name" class="form-control">
+                <option value="">All</option>
+                {% for name in host_names %}
+                    <option value="{{ name }}"
+                            {% if query_params.NAME == name %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="discovery_facility">Discovery Facility:</label>
+            <select id="discovery_facility" name="discovery_facility" class="form-control">
+                <option value="">All</option>
+                {% for facility in discovery_facilities %}
+                    <option value="{{ facility }}"
+                            {% if query_params.STAR == facility %}selected{% endif %}>{{ facility }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" onclick="startProgress()">Search</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Clear</button>
+        </div>
+
+        {% if not has_results and request.method == 'POST' %}
+            <p class="error-message">Please select at least one search criteria.</p>
+        {% endif %}
+    </form>
+
+    {% if has_results %}
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>Discovery Year <a href="?sort=DATE&order=asc">&#9650;</a> <a
+                        href="?sort=DATE&order=desc">&#9660;</a></th>
+                <th>Discovery Method <a href="?sort=PLANETDISCMETH&order=asc">&#9650;</a> <a
+                        href="?sort=PLANETDISCMETH&order=desc">&#9660;</a></th>
+                <th>Host Name <a href="?sort=NAME&order=asc">&#9650;</a> <a href="?sort=NAME&order=desc">&#9660;</a>
+                </th>
+                <th>Discovery Facility <a href="?sort=STAR&order=asc">&#9650;</a> <a href="?sort=STAR&order=desc">&#9660;</a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in table_data %}
+                <tr>
+                    <td>{{ row.DATE }}</td>
+                    <td>{{ row.PLANETDISCMETH }}</td>
+                    <td>
+                        <a href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname={{ row.NAME }}"
+                           target="_blank">{{ row.NAME }}</a></td>
+                    <td>{{ row.STAR }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function validateForm() {
+        const discoveryYear = document.getElementById('discovery_year').value;
+        const discoveryMethod = document.getElementById('discovery_method').value;
+        const hostName = document.getElementById('host_name').value;
+        const discoveryFacility = document.getElementById('discovery_facility').value;
+
+        if (!discoveryYear && !discoveryMethod && !hostName && !discoveryFacility) {
+            alert('Please select at least one search criteria.');
+            return false;
+        }
+        return true;
+    }
+
+    function startProgress() {
+        NProgress.start();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.querySelector('form').method === 'POST') {
+            NProgress.done();
+        }
+    });
+</script>
+</body>
+</html>
